@@ -5,8 +5,8 @@ import com.internetitem.logback.elasticsearch.util.AbstractPropertyAndEncoder;
 
 import java.io.IOException;
 
-class PropertySerializer<T> {
-    void serializeProperty(JsonGenerator jsonGenerator, T event, AbstractPropertyAndEncoder<T> propertyAndEncoder) throws IOException {
+public class PropertySerializer<T> {
+    public void serializeProperty(JsonGenerator jsonGenerator, T event, AbstractPropertyAndEncoder<T> propertyAndEncoder) throws IOException {
         String value = propertyAndEncoder.encode(event);
         if (propertyAndEncoder.allowEmpty() || (value != null && !value.isEmpty())) {
             switch (propertyAndEncoder.getType()) {
@@ -31,7 +31,7 @@ class PropertySerializer<T> {
 
     private void serializeIntField(JsonGenerator jsonGenerator, AbstractPropertyAndEncoder<T> propertyAndEncoder, String value) throws IOException {
         try {
-            jsonGenerator.writeNumberField(propertyAndEncoder.getName(), Integer.valueOf(value));
+            jsonGenerator.writeNumberField(propertyAndEncoder.getName(), Integer.parseInt(value));
         } catch (NumberFormatException e) {
             serializeStringField(jsonGenerator, propertyAndEncoder, value);
         }
@@ -39,7 +39,7 @@ class PropertySerializer<T> {
 
     private void serializeFloatField(JsonGenerator jsonGenerator, AbstractPropertyAndEncoder<T> propertyAndEncoder, String value) throws IOException {
         try {
-            jsonGenerator.writeNumberField(propertyAndEncoder.getName(), Float.valueOf(value));
+            jsonGenerator.writeNumberField(propertyAndEncoder.getName(), Float.parseFloat(value));
         } catch (NumberFormatException e) {
             serializeStringField(jsonGenerator, propertyAndEncoder, value);
         }
@@ -47,7 +47,7 @@ class PropertySerializer<T> {
 
     private void serializeBooleanField(JsonGenerator jsonGenerator, AbstractPropertyAndEncoder<T> propertyAndEncoder, String value) throws IOException {
         if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-            jsonGenerator.writeBooleanField(propertyAndEncoder.getName(), Boolean.valueOf(value));
+            jsonGenerator.writeBooleanField(propertyAndEncoder.getName(), Boolean.parseBoolean(value));
         } else {
             serializeStringField(jsonGenerator, propertyAndEncoder, value);
         }

@@ -5,18 +5,19 @@ import java.util.List;
 
 public class ElasticsearchProperties {
 
-	private List<Property> properties;
+    private List<Property> properties;
 
-	public ElasticsearchProperties() {
-		this.properties = new ArrayList<Property>();
-	}
+    public ElasticsearchProperties() {
+        this.properties = new ArrayList<Property>();
+    }
 
-	public List<Property> getProperties() {
-		return properties;
-	}
+    public List<Property> getProperties() {
+        return properties;
+    }
 
-	public void addProperty(Property property) {
-		properties.add(property);
-	}
+    public ElasticsearchProperties addProperty(Property property) {
+        properties.add(property);
+        return this;
+    }
 
 }

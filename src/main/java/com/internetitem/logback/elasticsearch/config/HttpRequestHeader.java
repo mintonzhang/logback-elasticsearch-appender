@@ -23,4 +23,13 @@ public class HttpRequestHeader {
     public void setValue(String value) {
         this.value = value;
     }
+
+    public HttpRequestHeader(String name, String value) {
+
+        this.name = name;
+        this.value = value;
+    }
+
+    public HttpRequestHeader() {
+    }
 }

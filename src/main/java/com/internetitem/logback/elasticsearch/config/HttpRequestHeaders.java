@@ -14,7 +14,13 @@ public class HttpRequestHeaders {
         return headers;
     }
 
-    public void addHeader(HttpRequestHeader header) {
+    public HttpRequestHeaders addHeader(HttpRequestHeader header) {
         this.headers.add(header);
+        return this;
+    }
+
+    public HttpRequestHeaders addHeader(String key, String value) {
+        this.headers.add(new HttpRequestHeader(key, value));
+        return this;
     }
 }
