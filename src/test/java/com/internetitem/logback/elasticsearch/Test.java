@@ -14,7 +14,7 @@ import java.util.Map;
 public class Test {
 
     static {
-        ElasticSearchLogger.setElasticSearchConnUrl("47.111.8.143", 35088, "TEST");
+        ElasticSearchLogger.setElasticSearchConnUrl("localhost", 9200, "TEST");
 
         ElasticSearchLogger.DEFAULT_PARAMS_MAP_SUPPLY = new ParamsMapSupply() {
 
