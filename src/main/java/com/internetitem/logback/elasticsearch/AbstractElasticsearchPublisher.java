@@ -9,6 +9,7 @@ import com.internetitem.logback.elasticsearch.config.Property;
 import com.internetitem.logback.elasticsearch.config.Settings;
 import com.internetitem.logback.elasticsearch.util.AbstractPropertyAndEncoder;
 import com.internetitem.logback.elasticsearch.util.ErrorReporter;
+import com.internetitem.logback.elasticsearch.util.ParamsMapSupply;
 import com.internetitem.logback.elasticsearch.writer.ElasticsearchWriter;
 import com.internetitem.logback.elasticsearch.writer.LoggerWriter;
 import com.internetitem.logback.elasticsearch.writer.StdErrWriter;
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractElasticsearchPublisher<T> implements Runnable {
@@ -43,7 +45,11 @@ public abstract class AbstractElasticsearchPublisher<T> implements Runnable {
     private ErrorReporter errorReporter;
     private volatile boolean working;
 
-    public AbstractElasticsearchPublisher(Context context, ErrorReporter errorReporter, Settings settings, ElasticsearchProperties properties, HttpRequestHeaders headers) throws IOException {
+    private final ParamsMapSupply supply;
+    //extra params
+    protected volatile Map<String, Object> params;
+
+    public AbstractElasticsearchPublisher(ParamsMapSupply supply, Context context, ErrorReporter errorReporter, Settings settings, ElasticsearchProperties properties, HttpRequestHeaders headers) throws IOException {
         this.errorReporter = errorReporter;
         this.events = new ArrayList<T>();
         this.lock = new Object();
@@ -59,6 +65,8 @@ public abstract class AbstractElasticsearchPublisher<T> implements Runnable {
         this.propertyList = generatePropertyList(context, properties);
 
         this.propertySerializer = new PropertySerializer<>();
+
+        this.supply = supply;
     }
 
     private static ElasticsearchOutputAggregator configureOutputAggregator(Settings settings, ErrorReporter errorReporter, HttpRequestHeaders httpRequestHeaders) {
@@ -99,6 +107,8 @@ public abstract class AbstractElasticsearchPublisher<T> implements Runnable {
         if (!outputAggregator.hasOutputs()) {
             return;
         }
+        //set params
+        params = supply.get();
 
         synchronized (lock) {
             events.add(event);
@@ -180,12 +190,16 @@ public abstract class AbstractElasticsearchPublisher<T> implements Runnable {
     protected void serializeEvent(JsonGenerator gen, T event, List<AbstractPropertyAndEncoder<T>> propertyList) throws IOException {
         gen.writeStartObject();
 
-        serializeCommonFields(gen, event);
+        this.serializeCommonFields(gen, event);
+
+        //序列化字符串
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            gen.writeObjectField(param.getKey(), param.getValue().toString());
+        }
 
         for (AbstractPropertyAndEncoder<T> pae : propertyList) {
             propertySerializer.serializeProperty(gen, event, pae);
         }
-
         gen.writeEndObject();
     }
 

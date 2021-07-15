@@ -1,8 +1,5 @@
 package com.internetitem.logback.elasticsearch;
 
-import java.io.IOException;
-import java.util.Map;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Context;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,11 +10,15 @@ import com.internetitem.logback.elasticsearch.config.Settings;
 import com.internetitem.logback.elasticsearch.util.AbstractPropertyAndEncoder;
 import com.internetitem.logback.elasticsearch.util.ClassicPropertyAndEncoder;
 import com.internetitem.logback.elasticsearch.util.ErrorReporter;
+import com.internetitem.logback.elasticsearch.util.ParamsMapSupply;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class ClassicElasticsearchPublisher extends AbstractElasticsearchPublisher<ILoggingEvent> {
 
-    public ClassicElasticsearchPublisher(Context context, ErrorReporter errorReporter, Settings settings, ElasticsearchProperties properties, HttpRequestHeaders headers) throws IOException {
-        super(context, errorReporter, settings, properties, headers);
+    public ClassicElasticsearchPublisher(ParamsMapSupply supply, Context context, ErrorReporter errorReporter, Settings settings, ElasticsearchProperties properties, HttpRequestHeaders headers) throws IOException {
+        super(supply, context, errorReporter, settings, properties, headers);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class ClassicElasticsearchPublisher extends AbstractElasticsearchPublishe
             gen.writeObjectField("message", formattedMessage);
         }
 
-        if(settings.isIncludeMdc()) {
+        if (settings.isIncludeMdc()) {
             for (Map.Entry<String, String> entry : event.getMDCPropertyMap().entrySet()) {
                 gen.writeObjectField(entry.getKey(), entry.getValue());
             }

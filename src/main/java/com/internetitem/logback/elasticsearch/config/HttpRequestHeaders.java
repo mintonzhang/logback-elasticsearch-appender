@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A container for the headers which will be sent to elasticsearch.
  */
-public class HttpRequestHeaders {
+public class HttpRequestHeaders implements Cloneable {
 
     private List<HttpRequestHeader> headers = new LinkedList<HttpRequestHeader>();
 
@@ -22,5 +22,17 @@ public class HttpRequestHeaders {
     public HttpRequestHeaders addHeader(String key, String value) {
         this.headers.add(new HttpRequestHeader(key, value));
         return this;
+    }
+
+    @Override
+    public HttpRequestHeaders clone() {
+
+        HttpRequestHeaders httpRequestHeaders = new HttpRequestHeaders();
+
+        for (HttpRequestHeader header : headers) {
+            httpRequestHeaders.addHeader(header.getName(), header.getValue());
+        }
+        return httpRequestHeaders;
+
     }
 }
